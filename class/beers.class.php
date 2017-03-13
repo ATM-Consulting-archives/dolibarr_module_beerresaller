@@ -115,7 +115,7 @@ class Beers extends CommonObject
 		
 		$sql.= 'name,';
 		$sql.= 'description,';
-		$sql.= 'prix';
+		$sql.= 'prix,';
 		$sql.= 'enStock';
 
 		

@@ -46,6 +46,8 @@ if (! $res) die("Include of main fails");
 include_once(DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php');
 dol_include_once('/beerresaler/class/beers.class.php');
 
+
+
 // Load traductions files requiredby by page
 //$langs->load("beerresaler");
 //$langs->load("other");
@@ -77,6 +79,7 @@ if ($user->societe_id > 0)
 
 
 $object = new Beers($db);
+
 $extrafields = new ExtraFields($db);
 
 // fetch optionals attributes and labels
@@ -87,6 +90,7 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php';  // Must be inclu
 
 // Initialize technical object to manage hooks of modules. Note that conf->hooks_modules contains array array
 $hookmanager->initHooks(array('beers'));
+
 
 
 /*******************************************************************
@@ -116,6 +120,9 @@ if (empty($reshook))
 	// Action to add record
 	if ($action == 'add')
 	{
+		echo "<br/>action add";
+	
+		
 		if (GETPOST('cancel'))
 		{
 			$urltogo=$backtopage?$backtopage:dol_buildpath('/beerresaler/beers_list.php',1);
@@ -128,14 +135,42 @@ if (empty($reshook))
 		/* object_prop_getpost_prop */
 	
 	
+	//Debug
+	
+		//var_dump($object);
+	/*
+	echo "<br/> before getNextNumRef";
+	echo "<br/> socid  : $socid";
+	echo "<br/> userid : $userid";
+	echo "<br/> soc  : $soc";
+	echo "<br/> user : $user";
+	
+	*/
+	//var_dump($object);
+	
+	
+	//echo "<br/> _POST : <pre>" ; print_r($_POST) ; echo "</pre>";
+	//echo "<br/> object : <pre>" ; print_r($object) ; echo "</pre>";
+	
+	
+	 /**/
+	 //echo "getnextnumref : ";  echo $object->getNextNumRef($userid);
+	 //exit();
+	
 	if (!empty($socid)) {
 		$thirdparty=new Societe($db);
 		$thirdparty->fetch($socid);
-		$object->ref = $object->getNextNumRef($userid,$thirdparty);
+		//$object->ref = $object->getNextNumRef($userid,$thirdparty);
 	} else {
-		$object->ref = $object->getNextNumRef($userid);
-	}
+			echo "<br/>in";
+			
+		$object->ref = ' '; //$object->getNextNumRef($userid);
+		//echo "<br/>" . $object->ref;
 		
+	}
+	echo "<br/>out";
+	echo "<br/> after getNextNumRef";
+	
 	
 	$object->name=GETPOST('name','alpha');
 	$object->description=GETPOST('description','alpha');
@@ -150,9 +185,13 @@ if (empty($reshook))
 			setEventMessages($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Ref")), null, 'errors');
 		}
 		
+		
+		
 		if (! $error)
 		{
+			echo "test objet->create";
 			$result=$object->create($user);
+			echo "\$result <pre>"; print_r($result);echo"</pre>";
 			if ($result > 0)
 			{
 				// Creation OK
@@ -176,6 +215,8 @@ if (empty($reshook))
 	// Action to update record
 	if ($action == 'update')
 	{
+		echo "action update";
+		
 		$error=0;
 
 		
@@ -184,7 +225,7 @@ if (empty($reshook))
 	$object->prix=GETPOST('prix','alpha');
 	$object->enStock=GETPOST('enStock','int');
 
-		
+	$object->ref = ' ';
 
 		if (empty($object->ref))
 		{
@@ -216,6 +257,8 @@ if (empty($reshook))
 	// Action to delete
 	if ($action == 'confirm_delete')
 	{
+		echo "<br/> action=confirm_delete";
+		
 		$result=$object->delete($user);
 		if ($result > 0)
 		{
@@ -241,7 +284,7 @@ if (empty($reshook))
 * Put here all code to build page
 ****************************************************/
 
-llxHeader('','Créer bière et/ou ajout au stock','');
+llxHeader('','Ajout au stock','');
 
 $form=new Form($db);
 
@@ -268,6 +311,8 @@ jQuery(document).ready(function() {
 // Part to create
 if ($action == 'create')
 {
+	echo "action create";
+	
 	print load_fiche_titre($langs->trans("Ajouter nouvelle biere"));
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -306,12 +351,15 @@ print '<tr><td class="fieldrequired">'.enStock.'</td><td><input class="flat" typ
 // Part to edit record
 if (($id || $ref) && $action == 'edit')
 {
+	echo "Edit mode";
+	
 	print load_fiche_titre('Edition Biere');//$langs->trans("MyModule"));
     
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="action" value="update">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	print '<input type="hidden" name="id" value="'.$object->id.'">';
+	// test felix :print '<input type="hidden" name="ref" value="'.$object->rowid.'">';
 	
 	dol_fiche_head();
 
@@ -334,7 +382,11 @@ print '<tr><td class="fieldrequired">'.enStock.'</td><td><input class="flat" typ
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+	print ' &nbsp; <div class="center"><input type="submit" class="button" name="Delete" value="'.$langs->trans("Delete").'">';
 	print ' &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	
+	print '</div>';
+	
 	print '</div>';
 
 	print '</form>';
