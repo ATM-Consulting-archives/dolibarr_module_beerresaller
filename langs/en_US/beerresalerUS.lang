@@ -55,5 +55,7 @@ MyBox = My box
 MyBoxDescription = My box description
 
 # beer_list page
-Fieldname = Name
+Fieldname = Nom
 Fielddescription = Description
+Fieldprix = Prix
+FieldenStock = En Stock

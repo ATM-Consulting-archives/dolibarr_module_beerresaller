@@ -118,17 +118,12 @@ if (empty($user->socid)) $fieldstosearchall["t.note_private"]="NotePrivate";
 // Definition of fields for list
 $arrayfields=array(
 
-/*    // remplacer par noms en dur
+    // remplacer par noms en dur
 't.name'=>array('label'=>$langs->trans("Fieldname"), 'checked'=>1),
 't.description'=>array('label'=>$langs->trans("Fielddescription"), 'checked'=>1),
 't.prix'=>array('label'=>$langs->trans("Fieldprix"), 'checked'=>1),
 't.enStock'=>array('label'=>$langs->trans("FieldenStock"), 'checked'=>1),
-*/
-    
-'t.name'=>array('label'=>'Nom', 'checked'=>1),
-'t.description'=>array('label'=>'description', 'checked'=>1),
-'t.prix'=>array('label'=>'prix', 'checked'=>1),
-'t.enStock'=>array('label'=>'En stock', 'checked'=>1),
+
 
     
 	

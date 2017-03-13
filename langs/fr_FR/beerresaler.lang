@@ -56,5 +56,14 @@ MyBoxDescription = My box description
 
 # beer_list page
 #MyModule = BeerResaler
-Fieldname = Name
+Name = Nom
+Description = Description
+Prix = Prix
+EnStock = En Stock
+
+Fieldname = Nom
 Fielddescription = Description
+Fieldprix = Prix
+FieldenStock = En Stock
+
+

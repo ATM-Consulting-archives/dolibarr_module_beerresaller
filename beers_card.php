@@ -120,7 +120,7 @@ if (empty($reshook))
 	// Action to add record
 	if ($action == 'add')
 	{
-		echo "<br/>action add";
+		//echo "<br/>action add";
 	
 		
 		if (GETPOST('cancel'))
@@ -147,12 +147,10 @@ if (empty($reshook))
 	
 	*/
 	//var_dump($object);
-	
-	
+
 	//echo "<br/> _POST : <pre>" ; print_r($_POST) ; echo "</pre>";
 	//echo "<br/> object : <pre>" ; print_r($object) ; echo "</pre>";
-	
-	
+		
 	 /**/
 	 //echo "getnextnumref : ";  echo $object->getNextNumRef($userid);
 	 //exit();
@@ -162,14 +160,15 @@ if (empty($reshook))
 		$thirdparty->fetch($socid);
 		//$object->ref = $object->getNextNumRef($userid,$thirdparty);
 	} else {
-			echo "<br/>in";
-			
+			//echo "<br/>in";
+		
+		//hack pour table perso (ne fonctionnera pas en full dolibarr)
 		$object->ref = ' '; //$object->getNextNumRef($userid);
 		//echo "<br/>" . $object->ref;
 		
 	}
-	echo "<br/>out";
-	echo "<br/> after getNextNumRef";
+	//echo "<br/>out";
+	//echo "<br/> after getNextNumRef";
 	
 	
 	$object->name=GETPOST('name','alpha');
@@ -215,7 +214,7 @@ if (empty($reshook))
 	// Action to update record
 	if ($action == 'update')
 	{
-		echo "action update";
+		echo "<br/>action update detected";
 		
 		$error=0;
 
@@ -252,17 +251,21 @@ if (empty($reshook))
 		{
 			$action='edit';
 		}
+	
+	//felix: retour au listing apres modif
+	header("Location: ".dol_buildpath('/beerresaler/beers_list.php',1));
+			exit;
 	}
 
 	// Action to delete
 	if ($action == 'confirm_delete')
 	{
-		echo "<br/> action=confirm_delete";
 		
 		$result=$object->delete($user);
 		if ($result > 0)
 		{
 			// Delete OK
+			echo "<br/> delete ok";
 			setEventMessages("RecordDeleted", null, 'mesgs');
 			header("Location: ".dol_buildpath('/beerresaler/beers_list.php',1));
 			exit;
@@ -347,6 +350,7 @@ print '<tr><td class="fieldrequired">'.enStock.'</td><td><input class="flat" typ
 }
 
 
+//if ( ! empty( GETPOST('delete','alpha') ) ) $action='confirm_delete';
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit')
@@ -356,10 +360,10 @@ if (($id || $ref) && $action == 'edit')
 	print load_fiche_titre('Edition Biere');//$langs->trans("MyModule"));
     
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="action" value="update">';
+	print '<input id="myAction" type="hidden" name="action" value="update">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	print '<input type="hidden" name="id" value="'.$object->id.'">';
-	// test felix :print '<input type="hidden" name="ref" value="'.$object->rowid.'">';
+	
 	
 	dol_fiche_head();
 
@@ -372,17 +376,24 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fielddescription").'</td><
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldprix").'</td><td><input class="flat" type="text" name="prix" value="'.$object->prix.'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("FieldenStock").'</td><td><input class="flat" type="text" name="enStock" value="'.$object->enStock.'"></td></tr>';
 */
-print '<tr><td class="fieldrequired">'.Nom.'</td><td><input class="flat" type="text" name="name" value="'.$object->name.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.Description.'</td><td><input class="flat" type="text" name="description" value="'.$object->description.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.Prix.'</td><td><input class="flat" type="text" name="prix" value="'.$object->prix.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.enStock.'</td><td><input class="flat" type="text" name="enStock" value="'.$object->enStock.'"></td></tr>';
+
+print '<tr><td class="fieldrequired">'.$langs->trans("Name").'</td><td><input class="flat" type="text" name="name" value="'.$object->name.'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Description").'</td><td><input class="flat" type="text" name="description" value="'.$object->description.'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Prix").'</td><td><input class="flat" type="text" name="prix" value="'.$object->prix.'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("EnStock").'</td><td><input class="flat" type="text" name="enStock" value="'.$object->enStock.'"></td></tr>';
+
+// <a href= dol_buildpath('/beerresaler/beers_list.php',1); ></a>
 
 	print '</table>';
 	
 	dol_fiche_end();
+	
+	print '<script> function deleteAction() { console.log("myActionValue Before = " + $("#myAction").val() );$("#myAction").val("delete") ; console.log("myActionValue = " + $("#myAction").val() ); }</script>';
 
 	print '<div class="center"><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print ' &nbsp; <div class="center"><input type="submit" class="button" name="Delete" value="'.$langs->trans("Delete").'">';
+	
+	print ' &nbsp; <div class="center"><input type="submit" class="button" name="delete" value="Supprimer" onClick="deleteAction();">';
+	
 	print ' &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 	
 	print '</div>';
@@ -399,7 +410,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 {
     $res = $object->fetch_optionals($object->id, $extralabels);
 
-	$head = commande_prepare_head($object);
+	//$head = commande_prepare_head($object);
+	$head = '';
 	dol_fiche_head($head, 'order', $langs->trans("CustomerOrder"), 0, 'order');
 		
 	print load_fiche_titre('Détail Biere');//$langs->trans("MyModule"));
@@ -407,6 +419,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	dol_fiche_head();
 
 	if ($action == 'delete') {
+		echo"</br> action delete detected";
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteMyOjbect'), $langs->trans('ConfirmDeleteMyObject'), 'confirm_delete', '', 0, 1);
 		print $formconfirm;
 	}
@@ -421,7 +434,7 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldprix").'</td><td>$obj
 print '<tr><td class="fieldrequired">'.$langs->trans("FieldenStock").'</td><td>$object->enStock</td></tr>';
 */
 
-print_r($res);
+// print_r($res);
 
 print '<tr><td class="fieldrequired">'.Name.'</td><td>$object->name</td></tr>';
 print '<tr><td class="fieldrequired">'.Description.'</td><td>$object->description</td></tr>';
